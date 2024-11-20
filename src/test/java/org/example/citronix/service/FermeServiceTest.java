@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 class FermeServiceTest {
@@ -62,7 +63,7 @@ class FermeServiceTest {
         fermeDTO.setSuperficie(150.0); // Invalid value
 
         // When & Then
-        IllegalArgumentException exception = org.junit.jupiter.api.Assertions.assertThrows(
+        IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
                 () -> fermeService.creerFerme(fermeDTO)
         );
@@ -98,6 +99,40 @@ class FermeServiceTest {
         assertEquals(30.0, result.getSuperficie());
         verify(fermeRepository, times(1)).save(existingFerme);
     }
+    @Test
+    void testConsulterFerme_Success() {
+        // Given
+        Long fermeId = 1L;
+        Ferme ferme = new Ferme();
+        ferme.setId(fermeId);
+        ferme.setNom("Ferme de Citrons");
+        ferme.setLocalisation("Marrakech");
+        ferme.setSuperficie(50.0);
 
+        when(fermeRepository.findById(fermeId)).thenReturn(Optional.of(ferme));
 
+        // When
+        FermeDTO result = fermeService.consulterFerme(fermeId);
+
+        // Then
+        assertEquals("Ferme de Citrons", result.getNom());
+        assertEquals("Marrakech", result.getLocalisation());
+        assertEquals(50.0, result.getSuperficie());
+        verify(fermeRepository, times(1)).findById(fermeId);
+    }
+    @Test
+    void testConsulterFerme_NotFound() {
+        // Given
+        Long fermeId = 1L;
+        when(fermeRepository.findById(fermeId)).thenReturn(Optional.empty());
+
+        // When & Then
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> fermeService.consulterFerme(fermeId)
+        );
+
+        assertEquals("Ferme non trouvée.", exception.getMessage());
+        verify(fermeRepository, times(1)).findById(fermeId);
+    }
 }
