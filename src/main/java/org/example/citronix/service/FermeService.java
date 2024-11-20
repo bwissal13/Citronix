@@ -15,11 +15,9 @@ public class FermeService {
     }
 
     public FermeDTO creerFerme(FermeDTO fermeDTO) {
-        // Validation des règles métier
         if (fermeDTO.getSuperficie() > 100) {
             throw new IllegalArgumentException("La superficie d'une ferme ne peut pas dépasser 100 hectares.");
         }
-
         Ferme ferme = FermeMapper.INSTANCE.toEntity(fermeDTO);
         ferme = fermeRepository.save(ferme);
         return FermeMapper.INSTANCE.toDTO(ferme);
