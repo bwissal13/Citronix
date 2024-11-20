@@ -1,7 +1,7 @@
 package org.example.citronix.controller;
 
 import org.example.citronix.dto.ChampDTO;
-import org.example.citronix.service.ChampService;
+import org.example.citronix.service.champ.ChampService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

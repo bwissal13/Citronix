@@ -1,4 +1,4 @@
-package org.example.citronix.service;
+package org.example.citronix.service.champ;
 
 import org.example.citronix.dto.ChampDTO;
 

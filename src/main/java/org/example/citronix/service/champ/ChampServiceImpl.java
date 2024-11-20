@@ -1,4 +1,4 @@
-package org.example.citronix.service.impl;
+package org.example.citronix.service.champ;
 
 import org.example.citronix.dto.ChampDTO;
 import org.example.citronix.entity.Champ;
@@ -6,7 +6,7 @@ import org.example.citronix.entity.Ferme;
 import org.example.citronix.mapper.ChampMapper;
 import org.example.citronix.repository.ChampRepository;
 import org.example.citronix.repository.FermeRepository;
-import org.example.citronix.service.ChampService;
+import org.example.citronix.service.champ.ChampService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
