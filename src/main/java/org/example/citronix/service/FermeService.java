@@ -41,4 +41,9 @@ public class FermeService {
         Ferme updatedFerme = fermeRepository.save(existingFerme);
         return FermeMapper.INSTANCE.toDTO(updatedFerme);
     }
+    public FermeDTO consulterFerme(Long fermeId) {
+        Ferme ferme = fermeRepository.findById(fermeId)
+                .orElseThrow(() -> new IllegalArgumentException("Ferme non trouvée."));
+        return FermeMapper.INSTANCE.toDTO(ferme);
+    }
 }

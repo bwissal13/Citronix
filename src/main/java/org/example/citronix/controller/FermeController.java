@@ -25,4 +25,9 @@ public class FermeController {
         FermeDTO updatedFerme = fermeService.modifierFerme(id, fermeDTO);
         return ResponseEntity.ok(updatedFerme);
     }
+    @GetMapping("/{id}")
+    public ResponseEntity<FermeDTO> consulterFerme(@PathVariable Long id) {
+        FermeDTO fermeDTO = fermeService.consulterFerme(id);
+        return ResponseEntity.ok(fermeDTO);
+    }
 }
