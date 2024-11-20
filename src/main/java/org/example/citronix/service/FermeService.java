@@ -22,4 +22,23 @@ public class FermeService {
         ferme = fermeRepository.save(ferme);
         return FermeMapper.INSTANCE.toDTO(ferme);
     }
+    public FermeDTO modifierFerme(Long fermeId, FermeDTO fermeDTO) {
+        Ferme existingFerme = fermeRepository.findById(fermeId)
+                .orElseThrow(() -> new IllegalArgumentException("Ferme non trouvée."));
+
+        // Validation des contraintes métier
+        if (fermeDTO.getSuperficie() <= 0.1) {
+            throw new IllegalArgumentException("La superficie doit être supérieure à 0.1 hectare.");
+        }
+
+        // Mise à jour des champs modifiables
+        existingFerme.setNom(fermeDTO.getNom());
+        existingFerme.setLocalisation(fermeDTO.getLocalisation());
+        existingFerme.setSuperficie(fermeDTO.getSuperficie());
+        existingFerme.setDateCreation(fermeDTO.getDateCreation());
+
+        // Enregistrement des modifications
+        Ferme updatedFerme = fermeRepository.save(existingFerme);
+        return FermeMapper.INSTANCE.toDTO(updatedFerme);
+    }
 }

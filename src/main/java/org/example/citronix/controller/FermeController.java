@@ -20,4 +20,9 @@ public class FermeController {
         FermeDTO createdFerme = fermeService.creerFerme(fermeDTO);
         return ResponseEntity.ok(createdFerme);
     }
+    @PutMapping("/{id}")
+    public ResponseEntity<FermeDTO> modifierFerme(@PathVariable Long id, @Valid @RequestBody FermeDTO fermeDTO) {
+        FermeDTO updatedFerme = fermeService.modifierFerme(id, fermeDTO);
+        return ResponseEntity.ok(updatedFerme);
+    }
 }
