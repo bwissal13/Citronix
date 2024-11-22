@@ -6,14 +6,16 @@ import org.example.citronix.entity.Champ;
 import org.example.citronix.mapper.ArbreMapper;
 import org.example.citronix.repository.ArbreRepository;
 import org.example.citronix.repository.ChampRepository;
-import org.example.citronix.service.arbre.ArbreService;
 import org.example.citronix.utility.AgeCalculator;
+import org.example.citronix.utility.ProductivityCalculator;
+import org.example.citronix.utility.ValidationUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 public class ArbreServiceImpl implements ArbreService {
+
     private final ArbreRepository arbreRepository;
     private final ChampRepository champRepository;
 
@@ -21,40 +23,54 @@ public class ArbreServiceImpl implements ArbreService {
         this.arbreRepository = arbreRepository;
         this.champRepository = champRepository;
     }
+
     @Override
     public ArbreDTO ajouterArbre(ArbreDTO arbreDTO) {
-        // Fetch the associated Champ
+        // Récupérer le champ associé
         Champ champ = champRepository.findById(arbreDTO.getChampId())
                 .orElseThrow(() -> new IllegalArgumentException("Champ non trouvé."));
 
-        // Validate constraints
-        validateArbreConstraints(champ);
+        // Valider les contraintes liées au champ et à la période de plantation
+        ValidationUtils.validatePlantationPeriod(arbreDTO.getDatePlantation());
+        validateTreeDensity(champ);
 
-        // Map and calculate age
+        // Mapper le DTO en entité
         Arbre arbre = ArbreMapper.INSTANCE.toEntity(arbreDTO);
         arbre.setChamp(champ);
-        arbre.setAge(AgeCalculator.calculateAge(arbre.getDatePlantation()));
 
+        // Calculer l'âge et déterminer l'état de productivité
+        int age = AgeCalculator.calculateAge(arbre.getDatePlantation());
+        arbre.setAge(age);
+        arbre.setEtatProductivite(ProductivityCalculator.determineProductivityState(age));
+
+        // Sauvegarder et mapper en DTO
         Arbre savedArbre = arbreRepository.save(arbre);
         return ArbreMapper.INSTANCE.toDTO(savedArbre);
     }
 
     @Override
     public ArbreDTO modifierArbre(Long id, ArbreDTO arbreDTO) {
+        // Récupérer l'arbre existant
         Arbre existingArbre = arbreRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Arbre non trouvé."));
 
+        // Récupérer et valider le champ
         Champ champ = champRepository.findById(arbreDTO.getChampId())
                 .orElseThrow(() -> new IllegalArgumentException("Champ non trouvé."));
+        ValidationUtils.validatePlantationPeriod(arbreDTO.getDatePlantation());
+        validateTreeDensity(champ);
 
-        validateArbreConstraints(champ);
-
-        // Update fields and recalculate age
+        // Mettre à jour les champs
         existingArbre.setType(arbreDTO.getType());
         existingArbre.setDatePlantation(arbreDTO.getDatePlantation());
-        existingArbre.setAge(AgeCalculator.calculateAge(arbreDTO.getDatePlantation()));
         existingArbre.setChamp(champ);
 
+        // Recalculer l'âge et l'état de productivité
+        int age = AgeCalculator.calculateAge(arbreDTO.getDatePlantation());
+        existingArbre.setAge(age);
+        existingArbre.setEtatProductivite(ProductivityCalculator.determineProductivityState(age));
+
+        // Sauvegarder et retourner le DTO
         Arbre updatedArbre = arbreRepository.save(existingArbre);
         return ArbreMapper.INSTANCE.toDTO(updatedArbre);
     }
@@ -73,7 +89,6 @@ public class ArbreServiceImpl implements ArbreService {
         return ArbreMapper.INSTANCE.toDTO(arbre);
     }
 
-
     @Override
     public void supprimerArbre(Long id) {
         if (!arbreRepository.existsById(id)) {
@@ -82,8 +97,9 @@ public class ArbreServiceImpl implements ArbreService {
         arbreRepository.deleteById(id);
     }
 
-    private void validateArbreConstraints(Champ champ) {
-        int maxDensity = (int) (champ.getSuperficie() * 100); // 100 trees per hectare
+    // Méthode utilitaire pour valider la densité des arbres dans un champ
+    private void validateTreeDensity(Champ champ) {
+        int maxDensity = (int) (champ.getSuperficie() * 100); // 100 arbres par hectare
         int currentTreeCount = champ.getArbres().size();
 
         if (currentTreeCount >= maxDensity) {
