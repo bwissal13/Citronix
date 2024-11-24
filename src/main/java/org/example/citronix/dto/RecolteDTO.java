@@ -1,26 +1,19 @@
 package org.example.citronix.dto;
 
-import lombok.Data;
+import lombok.*;
+import org.example.citronix.entity.Champ;
 import org.example.citronix.enums.Saison;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+
 @Data
 public class RecolteDTO {
     private Long id;
     private Saison saison;
-    private LocalDate dateRecolte;
-    private Long champId;
-    private List<Long> arbresIds;
-
-
-    private double quantite; 
-
-    public double getQuantite() {
-        return quantite;
-    }
-
-    public void setQuantite(double quantite) {
-        this.quantite = quantite;
-    }
+    private Long champID;
+    private double quantiteTotale;
+    private LocalDateTime dateRecolte;
+    private List<DetailRecolteDTO> detailsRecolte= new ArrayList<>();
 }
