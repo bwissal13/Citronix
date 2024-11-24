@@ -4,6 +4,7 @@ import jakarta.validation.constraints.*;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 public class FermeDTO {
@@ -22,4 +23,5 @@ public class FermeDTO {
     @NotNull(message = "La date de création est obligatoire.")
     @PastOrPresent(message = "La date de création ne peut pas être dans le futur.")
     private LocalDate dateCreation;
+    private List<ChampDTO> champs;
 }
