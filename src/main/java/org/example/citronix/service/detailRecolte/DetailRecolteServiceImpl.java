@@ -37,6 +37,13 @@ public class DetailRecolteServiceImpl implements DetailRecolteService {
         double quantiteTotale = 0;
         Arbre arbre = arbreRepository.findById(detailRecolteDTO.getArbreId())
                 .orElseThrow(() -> new IllegalArgumentException("Arbre non trouvé"));
+        boolean arbreDejaRecolte = detailRecolteRepository.existsByArbreIdAndRecolteSaison(
+                detailRecolteDTO.getArbreId(),
+                recolte.getSaison()
+        );
+        if (arbreDejaRecolte) {
+            throw new IllegalArgumentException("Cet arbre a déjà été récolté dans cette saison.");
+        }
         double productiviteParArbre = calculerQuantiteRecoltee(arbre);
         double quantitePourArbre = detailRecolteDTO.getQuantite() * productiviteParArbre;
         quantiteTotale += quantitePourArbre;
