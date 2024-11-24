@@ -35,6 +35,13 @@ public class RecolteServiceImpl implements RecolteService {
 
     @Override
     public RecolteDTO ajouterRecolte(RecolteDTO recolteDTO) {
+        boolean existeDeja = recolteRepository.existsByChampIdAndSaison(
+                recolteDTO.getChampID(),
+                recolteDTO.getSaison()
+        );
+        if (existeDeja) {
+            throw new IllegalArgumentException("Une récolte existe déjà pour ce champ dans cette saison.");
+        }
         Recolte recolte = RecolteMapper.INSTANCE.toEntity(recolteDTO);
         Champ champ = champRepository.findById(recolteDTO.getChampID()).orElseThrow(() -> new RuntimeException());
         recolte.setChamp(champ);
