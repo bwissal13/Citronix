@@ -1,59 +1,41 @@
 package org.example.citronix.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.PastOrPresent;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.example.citronix.enums.Saison;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
 public class Recolte {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "saison", nullable = false)
     private Saison saison;
-
-    @PastOrPresent(message = "La date de récolte doit être dans le passé ou aujourd'hui.")
-    private LocalDate dateRecolte;
-
     @ManyToOne
     @JoinColumn(name = "champ_id", nullable = false)
-    private Champ champ;
+    private Champ champ;  
 
-    @ManyToMany
-    @JoinTable(
-            name = "recolte_arbre",
-            joinColumns = @JoinColumn(name = "recolte_id"),
-            inverseJoinColumns = @JoinColumn(name = "arbre_id")
-    )
-    private List<Arbre> arbres;
 
-    public double getQuantite() {
-        return calculateQuantite();
-    }
+    @Column(nullable = false)
+    private double quantiteTotale;
 
-    private double calculateQuantite() {
-        return arbres.stream()
-                .mapToDouble(this::calculateProductivity)
-                .sum();
-    }
+    @Column(nullable = false)
+    private LocalDateTime dateRecolte;
 
-    private double calculateProductivity(Arbre arbre) {
-        int age = arbre.getAge();
-        if (age < 3) {
-            return 2.5;
-        } else if (age <= 10) {
-            return 12;
-        } else if (age <= 20) {
-            return 20;
-        }
-        return 0;
-    }
+    @OneToMany(mappedBy = "recolte", cascade = CascadeType.ALL)
+    private List<DetailRecolte> detailsRecolte;
+
+//    @OneToMany(mappedBy = "recolte")
+//    private List<Vente> ventes;  // Ventes associées à cette récolte
 }
